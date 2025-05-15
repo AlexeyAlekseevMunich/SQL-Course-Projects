@@ -1,7 +1,5 @@
 # Exam 3: SQL DQL - Customer and Order Data Analysis
 
-**Course Module:** Based on task K4.0004_2.0_7.12.A.01 (SQL Data Query Language)
-
 ## Task Description (General Overview)
 
 This exam required writing SQL queries to extract information from a database with `Kunden` (Customers), `Bestellungen` (Orders), and `Produkte` (Products) tables. Tasks involved filtering, sorting, joining tables, using aggregate functions, and subqueries for data analysis.
