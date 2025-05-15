@@ -1,7 +1,5 @@
 # Exam 4: SQL - Data Integrity, Triggers, and Assertions
 
-**Course Module:** Based on task K4.0004_2.0_9.2.A.02 (Data Integrity, Triggers, Assertions)
-
 ## Task Description (General Overview)
 
 This exam focused on ensuring data integrity in a warehouse management database. Tasks involved creating `Produkte` and `Lieferanten` tables with constraints, implementing a trigger to monitor stock levels, creating an assertion for average product price, and describing testing procedures.
