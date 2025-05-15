@@ -1,68 +1,61 @@
 # Exam 3: SQL DQL - Customer and Order Data Analysis
 
+**Course Module:** Based on task K4.0004_2.0_7.12.A.01 (SQL Data Query Language)
+
 ## Task Description (General Overview)
 
-This exam required writing SQL queries to extract information from a database with `Kunden` (Customers), `Bestellungen` (Orders), and `Produkte` (Products) tables. Tasks included filtering, sorting, joining tables, using aggregate functions, and subqueries for data analysis.
+This exam required writing SQL queries to extract information from a database with `Kunden` (Customers), `Bestellungen` (Orders), and `Produkte` (Products) tables. Tasks involved filtering, sorting, joining tables, using aggregate functions, and subqueries for data analysis.
 
 ## SQL Solution (`data_analysis_queries.sql`)
 
-The `data_analysis_queries.sql` file contains five SQL queries to address the specific tasks:
+The `data_analysis_queries.sql` file contains five SQL queries to address the specific tasks, as submitted:
 
-1.  **Query a):** Selects products priced between 50 and 150 Euros, ordered by category and price.
-    ```sql
-    SELECT *
-    FROM Produkte
-    WHERE Preis BETWEEN 50 AND 150
-    ORDER BY Kategorie, Preis ASC;
-    ```
-2.  **Query b):** Finds customers with names starting "Sch" in Berlin or Munich.
-    ```sql
-    SELECT Kunden_ID, Wohnort
-    FROM Kunden
-    WHERE Name LIKE 'Sch%'
-      AND Wohnort IN ('Berlin', 'München');
-    ```
-3.  **Query c):** Calculates the average number of orders per customer for each category, for customers with at least three orders.
-    ```sql
-    -- Calculates average orders per customer per category (for customers with >=3 orders in that category context)
-    SELECT p.Kategorie,
-           AVG(bestellungen_pro_kunde.anzahl) AS durchschnittliche_bestellungen
-    FROM Produkte p
-    JOIN (
-        SELECT b.Kunden_ID, prod.Kategorie, COUNT(DISTINCT b.Bestell_ID) AS anzahl
-        FROM Bestellungen b
-        JOIN Produkte prod ON b.Produkt_ID = prod.Produkt_ID -- Assumes Produkt_ID in Bestellungen
-        GROUP BY b.Kunden_ID, prod.Kategorie
-        HAVING COUNT(DISTINCT b.Bestell_ID) >= 3
-    ) AS bestellungen_pro_kunde ON p.Kategorie = bestellungen_pro_kunde.Kategorie
-    GROUP BY p.Kategorie;
-    ```
-4.  **Query d):** Identifies products that have never been ordered using `NOT EXISTS`.
-    ```sql
-    SELECT p.Produkt_ID, p.Bezeichnung
-    FROM Produkte p
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM Bestellungen b
-        WHERE b.Produkt_ID = p.Produkt_ID -- Assumes Produkt_ID in Bestellungen
-    );
-    ```
-5.  **Query e):** Finds customers whose total order amount exceeds 1000 Euros.
-    ```sql
-    SELECT k.Kunden_ID, k.Name,
-           SUM(b.Gesamtbetrag) AS gesamtbestellwert
-    FROM Kunden k
-    JOIN Bestellungen b ON k.Kunden_ID = b.Kunden_ID
-    GROUP BY k.Kunden_ID, k.Name
-    HAVING SUM(b.Gesamtbetrag) > 1000
-    ORDER BY gesamtbestellwert DESC;
-    ```
+```sql
+--a) Erstelle eine Anfrage, die alle Produkte anzeigt, deren Preis zwischen 50 und 150 Euro liegt,
+--und sortiere die Ergebnisse nach der Kategorie und innerhalb der Kategorie nach dem Preis in aufsteigender Reihenfolge.
+SELECT *
+FROM Produkte
+WHERE Preis BETWEEN 50 AND 150
+ORDER BY Kategorie, Preis ASC;
 
-## Key SQL DQL Concepts Demonstrated:
+--b) Entwickle eine Anfrage, um alle Kunden zu ermitteln, deren Namen mit "Sch" beginnen und die in Berlin oder München wohnen.
+--Zeige ihre Kunden-ID und Wohnort an.
+SELECT Kunden_ID, Wohnort
+FROM Kunden
+WHERE Name LIKE 'Sch%'
+  AND Wohnort IN ('Berlin', 'München');
 
-*   Filtering data (`WHERE` clause with `BETWEEN`, `LIKE`, `IN`).
-*   Sorting results (`ORDER BY`).
-*   Joining tables (`JOIN`).
-*   Aggregate functions (`AVG`, `COUNT`, `SUM`) with `GROUP BY` and `HAVING`.
-*   Subqueries and `EXISTS` / `NOT EXISTS` predicate.
-*   Table and column aliases.
+--c) Formuliere eine Anfrage, die für jede Kategorie die durchschnittliche Anzahl von Bestellungen pro Kunde berechnet,
+--unter der Bedingung, dass die Kunden mindestens drei Bestellungen getätigt haben.
+--Gib die Kategorie und den berechneten Durchschnittswert an.
+SELECT p.Kategorie,
+       AVG(bestellungen_pro_kunde.anzahl) AS durchschnittliche_bestellungen
+FROM Produkte p
+JOIN (
+    SELECT b.Kunden_ID, prod.Kategorie, COUNT(DISTINCT b.Bestell_ID) AS anzahl
+    FROM Bestellungen b
+    JOIN Produkte prod ON b.Produkt_ID = prod.Produkt_ID -- Assumes Produkt_ID in Bestellungen
+    GROUP BY b.Kunden_ID, prod.Kategorie
+    HAVING COUNT(DISTINCT b.Bestell_ID) >= 3
+) AS bestellungen_pro_kunde ON p.Kategorie = bestellungen_pro_kunde.Kategorie
+GROUP BY p.Kategorie;
+
+--d) Schreibe eine Anfrage, die prüft, ob es Produkte gibt, die noch nie bestellt wurden. Verwende das exists-Prädikat.
+SELECT p.Produkt_ID, p.Bezeichnung
+FROM Produkte p
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Bestellungen b
+    WHERE b.Produkt_ID = p.Produkt_ID -- Assumes Produkt_ID in Bestellungen
+);
+
+--e) Erstelle eine Anfrage, die alle Kunden findet, deren Gesamtbetrag aller Bestellungen über 1000 Euro liegt.
+--Verwende Skalare Ausdrücke und Aggregatfunktionen, um den Gesamtbetrag pro Kunde zu berechnen,
+--und zeige die Kunden-ID und den Gesamtbetrag an.
+SELECT k.Kunden_ID, k.Name,
+       SUM(b.Gesamtbetrag) AS gesamtbestellwert
+FROM Kunden k
+JOIN Bestellungen b ON k.Kunden_ID = b.Kunden_ID
+GROUP BY k.Kunden_ID, k.Name
+HAVING SUM(b.Gesamtbetrag) > 1000
+ORDER BY gesamtbestellwert DESC;
